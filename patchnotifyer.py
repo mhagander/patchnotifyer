@@ -39,12 +39,18 @@ if __name__ == "__main__":
 
     apt_pkg.init()
 
+	# Turn off cache to avoid concurrency issues
+    apt_pkg.config.set("Dir::Cache::pkgcache","")
+
+    # "apt-get update"
     sl = apt_pkg.SourceList()
     sl.read_main_list()
     tmpcache = apt_pkg.Cache(_DevNullProgress())
     tmpcache.update(_DevNullProgress(), sl)
 
-    depcache = apt_pkg.DepCache(tmpcache)
+    # Now do the actual check
+    cache = apt_pkg.Cache(_DevNullProgress())
+    depcache = apt_pkg.DepCache(cache)
     depcache.read_pinfile()
     depcache.init()
 
@@ -56,7 +62,7 @@ if __name__ == "__main__":
     if depcache.del_count > 0:
         status.write("Dist-upgrade generated {0} pending package removals!\n\n".format(depcache.del_count))
 
-    for pkg in tmpcache.packages:
+    for pkg in cache.packages:
         if depcache.marked_install(pkg) or depcache.marked_upgrade(pkg):
             status.write("Package {0} requires an update\n".format(pkg.name))
 
