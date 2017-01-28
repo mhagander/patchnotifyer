@@ -19,6 +19,8 @@ class _DevNullProgress(object):
         pass
     def pulse(self, owner = None):
         pass
+    def update_status(self, a, b, c, d):
+        pass
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Patch status notifyer")
