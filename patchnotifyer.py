@@ -27,6 +27,7 @@ if __name__ == "__main__":
     parser.add_argument('--fromaddr', type=str, help='From email address')
     parser.add_argument('--toaddr', type=str, help='To email address')
     parser.add_argument('--subject', type=str, help='Subject', default="Patch status on {0}".format(socket.gethostname()))
+    parser.add_argument('--ignorepkg', type=str, nargs='+', default='Ignore packages by exact name')
 
     args = parser.parse_args()
 
@@ -64,6 +65,8 @@ if __name__ == "__main__":
 
     for pkg in cache.packages:
         if depcache.marked_install(pkg) or depcache.marked_upgrade(pkg):
+            if pkg.name in args.ignorepkg:
+                continue
             status.write("Package {0} requires an update\n".format(pkg.name))
 
     if status.tell() > 0:
